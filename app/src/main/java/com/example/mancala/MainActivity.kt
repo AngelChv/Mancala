@@ -13,6 +13,7 @@ import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
@@ -154,7 +155,7 @@ class MainActivity : AppCompatActivity() {
             textSize = 16f                   // Tamaño de texto
             setTextColor(Color.WHITE)        // Color del texto
             gravity = android.view.Gravity.CENTER  // Centrar el texto dentro del círculo
-            background = resources.getDrawable(R.drawable.seed_image_foreground, null)  // Usar el fondo circular
+            background = ResourcesCompat.getDrawable(resources, R.drawable.seed_image_foreground, null)  // Usar el fondo circular
             layoutParams = FrameLayout.LayoutParams(100, 100).apply {
                 gravity = android.view.Gravity.CENTER       // Centrar el TextView en el contenedor
             }
