@@ -70,7 +70,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             setPositiveButton("Elegir") { _, _ ->
-                game = MancalaGame(buttons.size, selectedNumber.toInt(), ::updateUI)
+                game = MancalaGame(buttons.size, selectedNumber.toInt(), ::plantAnimation, ::updateUI)
                 configureButtons()
             }
 
@@ -89,7 +89,7 @@ class MainActivity : AppCompatActivity() {
             button.setOnClickListener {
                 if (!game.loading && game.holes[index] != 0) {
                     lifecycleScope.launch {
-                        when (game.plant(index, game.holes[index])) {
+                        when (game.play(index, game.holes[index])) {
                             MancalaGame.Status.WIN -> winEvent()
                             MancalaGame.Status.LOOSE -> looseEvent()
                             MancalaGame.Status.CONTINUE -> continueEvent()
@@ -102,19 +102,20 @@ class MainActivity : AppCompatActivity() {
         buttons.last().text = "${game.holes.last()}"
     }
 
+    private fun plantAnimation() {
+        game.apply {
+            highlightButton(buttons[currentHole])
+            animateSeed(
+                fromButton = buttons[currentHole],
+                toButton = buttons[(currentHole + 1) % buttons.size],
+                seedCount = currentSeeds
+            ) // Mover semillas al siguiente hoyo.
+            buttons[currentHole].text = "${holes[currentHole]}" // Actualizar número de semillas.
+        }
+    }
+
     private fun updateUI() {
         buttons.forEachIndexed { index, button ->
-            if (index == game.currentHole) { // Hoyo activo
-                highlightButton(button)
-                animateSeed(
-                    button,
-                    buttons[(index + 1) % buttons.size],
-                    game.currentSeeds
-                ) // Mover semillas al siguiente hoyo.
-                button.setBackgroundColor(MancalaGame.Colors.SELECTED.value)
-            } else { // Hoyo inactivo
-                button.setBackgroundColor(MancalaGame.Colors.DEFAULT.value)
-            }
             button.text = "${game.holes[index]}" // Actualizar número de semillas.
         }
     }
@@ -131,10 +132,10 @@ class MainActivity : AppCompatActivity() {
         AlertDialog.Builder(this).apply {
             setTitle(message)
             setMessage("Quieres seguir jugando?")
-            setPositiveButton("Si") { dialog, _ ->
+            setPositiveButton("Si") { _, _ ->
                 initializeGame()
             }
-            setNegativeButton("Salir") { dialog, _ ->
+            setNegativeButton("Salir") { _, _ ->
                 finish()
             }
             setCancelable(false)
@@ -166,7 +167,7 @@ class MainActivity : AppCompatActivity() {
 
         AnimatorSet().apply {
             playTogether(animatorX, animatorY)
-            duration = 1000
+            duration = game.delay
             addListener(object : Animator.AnimatorListener {
                 override fun onAnimationEnd(animation: Animator) {
                     binding.main.removeView(seed)  // Quitar la semilla al terminar

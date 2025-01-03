@@ -4,11 +4,17 @@ import android.graphics.Color
 import android.util.Log
 import kotlinx.coroutines.delay
 
-class MancalaGame(size: Int, private val seedsPerHole: Int, private val updateUI: () -> Unit) {
+class MancalaGame(
+    size: Int,
+    private val seedsPerHole: Int,
+    private val updateUIBeforePlant: () -> Unit,
+    private val updateUIAfterPlant: () -> Unit
+) {
     val holes: IntArray = IntArray(size)
     var loading: Boolean = false
     var currentSeeds = 0
     var currentHole = -1
+    val delay: Long = 2000
 
     init {
         holes.forEachIndexed { index, _ ->
@@ -20,7 +26,7 @@ class MancalaGame(size: Int, private val seedsPerHole: Int, private val updateUI
         }
     }
 
-    suspend fun plant(index: Int, seedsCount: Int): Status {
+    suspend fun play(index: Int, seedsCount: Int): Status {
         loading = true
         currentHole = index
         currentSeeds = seedsCount
@@ -30,8 +36,8 @@ class MancalaGame(size: Int, private val seedsPerHole: Int, private val updateUI
 
         // Plantar semillas:
         while (currentSeeds > 0 && status == Status.CONTINUE) { // Ir avanzando por los hoyos rellenando de una en una.
-            updateUI() // Actualizar la interfáz mediante la función percibida.
-            delay(1000)
+            updateUIBeforePlant() // Actualizar la interfáz mediante la función percibida.
+            delay(delay)
 
             if (++currentHole >= holes.size) currentHole = 0 // Recorrer los hoyos circularmente.
 
@@ -54,6 +60,8 @@ class MancalaGame(size: Int, private val seedsPerHole: Int, private val updateUI
                     status = Status.WIN
                 }
             }
+
+            updateUIAfterPlant()
         }
 
         loading = false
