@@ -25,8 +25,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var buttons: Array<Button>
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        // todo cuando se pulsa un boton y se estan moviendo las semillas, que no se permita pulsar.
-        // todo eliminar bug de plantar semilla 0
+        // todo informar de las reglas
         // todo hacer que no ocupe espacio el textview con las semillas que se plantan.
         // todo hacer que no se pierdan los datos al girar la pantalla
         super.onCreate(savedInstanceState)
@@ -48,6 +47,8 @@ class MainActivity : AppCompatActivity() {
             binding.rumaBttn,
         )
 
+        buttons.forEach { button -> button.textSize = 32f }
+
         initializeGame()
     }
 
@@ -62,7 +63,8 @@ class MainActivity : AppCompatActivity() {
             }
 
             setPositiveButton("Elegir") { _, _ ->
-                game = MancalaGame(buttons.size, selectedNumber.toInt(), ::plantAnimation, ::updateUI)
+                game =
+                    MancalaGame(buttons.size, selectedNumber.toInt(), ::plantAnimation, ::updateUI)
                 configureButtons()
             }
 
@@ -141,17 +143,17 @@ class MainActivity : AppCompatActivity() {
     private fun animateSeed(fromButton: Button, toButton: Button, seedCount: Int) {
         val seed = createSeedTextView(seedCount)  // Crea el TextView con el número de semillas
 
-        binding.root.addView(seed)  // Añadir al contenedor principal
+        binding.main.addView(seed)  // Añadir al contenedor principal
 
         // Configurar posición inicial
-        val startX = fromButton.x + fromButton.width / 2
-        val startY = fromButton.y + fromButton.height / 2
+        val startX = fromButton.x
+        val startY = fromButton.y
         seed.x = startX
         seed.y = startY
 
         // Calcular posición final
-        val endX = toButton.x + toButton.width / 2
-        val endY = toButton.y + toButton.height / 2
+        val endX = toButton.x
+        val endY = toButton.y
 
         // Crear animación
         val animatorX = ObjectAnimator.ofFloat(seed, "x", endX)
@@ -177,7 +179,7 @@ class MainActivity : AppCompatActivity() {
         // Crea un TextView con el número de semillas
         return TextView(this).apply {
             text = "$seedCount"              // Muestra el número de semillas
-            textSize = 16f                   // Tamaño de texto
+            textSize = 32f                   // Tamaño de texto
             setTextColor(Color.WHITE)        // Color del texto
             gravity = android.view.Gravity.CENTER  // Centrar el texto dentro del círculo
             background = ResourcesCompat.getDrawable(
@@ -185,7 +187,10 @@ class MainActivity : AppCompatActivity() {
                 R.drawable.seed_image_foreground,
                 null
             )  // Usar el fondo circular
-            layoutParams = FrameLayout.LayoutParams(100, 100).apply {
+            layoutParams = FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.WRAP_CONTENT,
+                FrameLayout.LayoutParams.WRAP_CONTENT
+            ).apply {
                 gravity = android.view.Gravity.CENTER       // Centrar el TextView en el contenedor
             }
         }
