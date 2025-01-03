@@ -27,6 +27,10 @@ class MainActivity : AppCompatActivity() {
     private lateinit var buttons: Array<Button>
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        // todo cuando se pulsa un boton y se estan moviendo las semillas, que no se permita pulsar.
+        // todo eliminar bug de plantar semilla 0
+        // todo hacer que no ocupe espacio el textview con las semillas que se plantan.
+        // todo hacer que no se pierdan los datos al girar la pantalla
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -56,49 +60,76 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initializeGame() {
-        game = MancalaGame(buttons.size, ::updateUI)
+        // Pedir al usuario el número de semillas:
+        val numbers = arrayOf("2", "3", "4")
+        var selectedNumber = numbers[0] // Valor por defecto
+        AlertDialog.Builder(this).apply {
+            setTitle("Elige el número de semillas por hoyo.")
+            setSingleChoiceItems(numbers, 0) { _, selected ->
+                selectedNumber = numbers[selected]
+            }
 
-        // Configurar los botones con la lógica del juego.
-        buttons.forEachIndexed { index, button ->
+            setPositiveButton("Elegir") { _, _ ->
+                game = MancalaGame(buttons.size, selectedNumber.toInt(), ::updateUI)
+                configureButtons()
+            }
+
+            setCancelable(false)
+        }.show()
+    }
+
+    /**
+     * Configura los botones con la lógica del juego.
+     */
+    private fun configureButtons() {
+        // Se recorren todos menos el último, ya que es la ruma y no tiene interacción.
+        buttons.dropLast(1).forEachIndexed { index, button ->
             button.text = "${game.holes[index]}"
             button.setBackgroundColor(MancalaGame.Colors.DEFAULT.value)
-            if (index != buttons.lastIndex) { // Todos los botones menos el último:
-                button.setOnClickListener {
-                    if (!game.loading) {
-                        lifecycleScope.launch {
-                            when (game.plant(index, game.holes[index])) {
-                                MancalaGame.Status.WIN -> winEvent()
-                                MancalaGame.Status.LOOSE -> looseEvent()
-                                MancalaGame.Status.CONTINUE -> continueEvent()
-                            }
-                            updateUI()
+            button.setOnClickListener {
+                if (!game.loading && game.holes[index] != 0) {
+                    lifecycleScope.launch {
+                        when (game.plant(index, game.holes[index])) {
+                            MancalaGame.Status.WIN -> winEvent()
+                            MancalaGame.Status.LOOSE -> looseEvent()
+                            MancalaGame.Status.CONTINUE -> continueEvent()
                         }
                     }
                 }
             }
         }
+
+        buttons.last().text = "${game.holes.last()}"
     }
 
     private fun updateUI() {
         buttons.forEachIndexed { index, button ->
-            if (index == game.currentHole) {
+            if (index == game.currentHole) { // Hoyo activo
                 highlightButton(button)
-                animateSeed(button, buttons[(index + 1) % buttons.size], game.currentSeeds) // Semilla al siguiente.
+                animateSeed(
+                    button,
+                    buttons[(index + 1) % buttons.size],
+                    game.currentSeeds
+                ) // Mover semillas al siguiente hoyo.
                 button.setBackgroundColor(MancalaGame.Colors.SELECTED.value)
-            } else {
+            } else { // Hoyo inactivo
                 button.setBackgroundColor(MancalaGame.Colors.DEFAULT.value)
             }
-            button.text = "${game.holes[index]}"
+            button.text = "${game.holes[index]}" // Actualizar número de semillas.
         }
     }
 
     private fun winEvent() {
-        // todo
+        endEvent("Has Ganado!")
     }
 
     private fun looseEvent() {
+        endEvent("Has Perdido!")
+    }
+
+    private fun endEvent(message: String) {
         AlertDialog.Builder(this).apply {
-            setTitle("Has perdido!")
+            setTitle(message)
             setMessage("Quieres seguir jugando?")
             setPositiveButton("Si") { dialog, _ ->
                 initializeGame()
@@ -106,6 +137,7 @@ class MainActivity : AppCompatActivity() {
             setNegativeButton("Salir") { dialog, _ ->
                 finish()
             }
+            setCancelable(false)
         }.show()
     }
 
@@ -155,7 +187,11 @@ class MainActivity : AppCompatActivity() {
             textSize = 16f                   // Tamaño de texto
             setTextColor(Color.WHITE)        // Color del texto
             gravity = android.view.Gravity.CENTER  // Centrar el texto dentro del círculo
-            background = ResourcesCompat.getDrawable(resources, R.drawable.seed_image_foreground, null)  // Usar el fondo circular
+            background = ResourcesCompat.getDrawable(
+                resources,
+                R.drawable.seed_image_foreground,
+                null
+            )  // Usar el fondo circular
             layoutParams = FrameLayout.LayoutParams(100, 100).apply {
                 gravity = android.view.Gravity.CENTER       // Centrar el TextView en el contenedor
             }

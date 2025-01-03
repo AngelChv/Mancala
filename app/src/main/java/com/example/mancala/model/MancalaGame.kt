@@ -1,9 +1,10 @@
 package com.example.mancala.model
 
 import android.graphics.Color
+import android.util.Log
 import kotlinx.coroutines.delay
 
-class MancalaGame(size: Int, private val updateUI: () -> Unit) {
+class MancalaGame(size: Int, private val seedsPerHole: Int, private val updateUI: () -> Unit) {
     val holes: IntArray = IntArray(size)
     var loading: Boolean = false
     var currentSeeds = 0
@@ -12,7 +13,7 @@ class MancalaGame(size: Int, private val updateUI: () -> Unit) {
     init {
         holes.forEachIndexed { index, _ ->
             if (index != holes.lastIndex) {
-                holes[index] = (2..4).random()
+                holes[index] = seedsPerHole
             } else {
                 holes[index] = 0
             }
@@ -23,31 +24,45 @@ class MancalaGame(size: Int, private val updateUI: () -> Unit) {
         loading = true
         currentHole = index
         currentSeeds = seedsCount
+        var status = Status.CONTINUE
 
         holes[currentHole] = 0 // Vaciar hoyo inicial.
 
         // Plantar semillas:
-        while (currentSeeds > 0) { // Ir avanzando por los hoyos rellenando de una en una.
+        while (currentSeeds > 0 && status == Status.CONTINUE) { // Ir avanzando por los hoyos rellenando de una en una.
             updateUI() // Actualizar la interfáz mediante la función percibida.
-            delay(1000);
+            delay(1000)
+
             if (++currentHole >= holes.size) currentHole = 0 // Recorrer los hoyos circularmente.
-            if (currentHole != holes.lastIndex && currentSeeds == 1) {
+
+            if (currentSeeds != 1) { // Cuando no es la última semilla:
+                putSeed()
+            } else if (currentHole != holes.lastIndex) { // La última semilla no cae en la ruma
                 // Si la ultima semilla cae en un hoyo vacio se pierde
                 if (holes[currentHole] == 0) {
-                    loading = false
-                    return Status.LOOSE
+                    status = Status.LOOSE
+                } else {
+                    // Si cae en un hoyo con semillas se cogen todas y se sigue sembrando
+                    currentSeeds += holes[currentHole]
+                    holes[currentHole] = 0 // vaciar hoyo
                 }
-                // Si cae en un hoyo con semillas se cogen todas y se sigue sembrando
-                currentSeeds += holes[currentHole]
-                holes[currentHole] = 0 // vaciar hoyo
-                loading = false
-                continue
+            } else { // La última semilla cae en la ruma
+                putSeed()
+                Log.i("pruebas", "${holes.last()}")
+                if (holes.last() == seedsPerHole * holes.lastIndex) { // Victoria
+                    // Cúando la última semilla se planta en la ruma y estan todas en ella:
+                    status = Status.WIN
+                }
             }
-            holes[currentHole]++ // Aumentar semillas del siguiente hoyo.
-            currentSeeds-- // Decrementar las semillas.
         }
+
         loading = false
-        return Status.CONTINUE
+        return status
+    }
+
+    private fun putSeed() {
+        holes[currentHole]++ // Aumentar semillas del hoyo actual.
+        currentSeeds-- // Decrementar las semillas que se plantan.
     }
 
     enum class Status {
