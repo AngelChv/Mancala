@@ -3,12 +3,10 @@ package com.example.mancala
 import android.animation.Animator
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
-import android.content.res.Configuration
 import android.graphics.Color
 import android.os.Bundle
 import android.widget.Button
 import android.widget.FrameLayout
-import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AlertDialog
@@ -41,12 +39,6 @@ class MainActivity : AppCompatActivity() {
             insets
         }
 
-        // Cambiar orientación según la orientación de la pantalla
-        if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            binding.root.orientation = LinearLayout.HORIZONTAL
-        } else {
-            binding.root.orientation = LinearLayout.VERTICAL
-        }
 
         buttons = arrayOf(
             binding.hole1Bttn,
@@ -149,7 +141,7 @@ class MainActivity : AppCompatActivity() {
     private fun animateSeed(fromButton: Button, toButton: Button, seedCount: Int) {
         val seed = createSeedTextView(seedCount)  // Crea el TextView con el número de semillas
 
-        binding.main.addView(seed)  // Añadir al contenedor principal
+        binding.root.addView(seed)  // Añadir al contenedor principal
 
         // Configurar posición inicial
         val startX = fromButton.x + fromButton.width / 2
