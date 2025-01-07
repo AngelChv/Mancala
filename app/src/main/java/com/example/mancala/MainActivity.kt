@@ -25,8 +25,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var buttons: Array<Button>
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        // todo informar de las reglas
-        // todo hacer que no ocupe espacio el textview con las semillas que se plantan.
         // todo hacer que no se pierdan los datos al girar la pantalla
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -37,7 +35,6 @@ class MainActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-
 
         buttons = arrayOf(
             binding.hole1Bttn,
