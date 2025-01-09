@@ -51,7 +51,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun initializeGame() {
         // Pedir al usuario el número de semillas:
-        val numbers = arrayOf("2", "3", "4")
+        val numbers = arrayOf("2", "6", "7")
         var selectedNumber = numbers[0] // Valor por defecto
         AlertDialog.Builder(this).apply {
             setTitle("Elige el número de semillas por hoyo.")
