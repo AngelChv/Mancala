@@ -14,7 +14,7 @@ class MancalaGame(
     var loading: Boolean = false
     var currentSeeds = 0
     var currentHole = -1
-    val delay: Long = 2000
+    val delay: Long = 1000 // todo hacer que el usuario pueda modifcarlo mediante un slider
 
     init {
         holes.forEachIndexed { index, _ ->
