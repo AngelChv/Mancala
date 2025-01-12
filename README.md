@@ -72,7 +72,7 @@
 
 ✨ El tablero de Tchuka Ruma consta de 5 hoyos dispuestos en fila:
 
-- **Cuatro hoyos iniciales**: Contienen 2 semillas cada uno al comienzo (total: 8 semillas).
+- **Cuatro hoyos iniciales**: Contienen tantas semillas como se haya seleccionado.
 - **La Ruma**: Un quinto hoyo más grande que funciona como almacén, inicialmente vacío.
 
 🎯 **Objetivo del juego**:
@@ -80,14 +80,14 @@ Almacenar todas las semillas en la Ruma siguiendo una serie de movimientos estra
 
 🌱 **Reglas del juego**:
 
-i) Toma las semillas de un hoyo cualquiera y repártelas, una por una, en los hoyos siguientes en dirección hacia la Ruma (de izquierda a derecha si esta está al final del tablero).
+i) Toma las semillas de un hoyo cualquiera y repartidas, una por una, en los hoyos siguientes en dirección hacia la Ruma.
 
-ii) Si quedan semillas en la mano después de llegar a la Ruma, continúa colocando las semillas desde el lado opuesto del tablero.
+ii) Si quedan semillas en la mano después de llegar a la Ruma, se continúan sembrando las semillas desde el lado opuesto del tablero.
 
 iii) Según donde caiga la última semilla, pueden ocurrir tres situaciones:
 
-- **a)** El hoyo tiene más semillas: Toma todas las semillas de ese hoyo y repite el proceso.
-- **b)** La última semilla cae en la Ruma: Deja la semilla y elige otro hoyo para continuar.
+- **a)** El hoyo tiene más semillas: se toman todas las semillas de ese hoyo y repite el proceso.
+- **b)** La última semilla cae en la Ruma: se deja la semilla y elige otro hoyo para continuar.
 - **c)** El hoyo está vacío: Pierdes la partida y deberás reiniciar.
 
 iv) El juego termina cuando todas las semillas están almacenadas en la Ruma. ¡Has ganado! 🏆
